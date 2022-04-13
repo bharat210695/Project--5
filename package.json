@@ -1,0 +1,27 @@
+{
+    "name": "src",
+    "version": "1.0.0",
+    "description": "Backend cohort for Thorium(feb-May)",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nodemon ./src/index.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "aws-sdk": "^2.1111.0",
+        "axios": "^0.26.1",
+        "bcrypt": "^5.0.1",
+        "bcrypt-salt": "^1.1.12",
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "express": "^4.17.1",
+        "jsonwebtoken": "^8.5.1",
+        "moment": "^2.29.1",
+        "mongoose": "^6.2.10",
+        "multer": "^1.4.4",
+        "nodemon": "^2.0.15",
+        "validator": "^13.7.0"
+    }
+}
