@@ -5,7 +5,8 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const aws = require('aws-sdk')
-    //======================================================================================//
+
+//======================================================================================//
 const isValid = function(value) {
     if (typeof value === 'undefined' || value === null) return false
     if (typeof value === 'string' && value.trim().length === 0) return false

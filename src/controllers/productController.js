@@ -182,6 +182,13 @@ const getProduct = async function(req, res) {
             }
             return res.status(200).send({ status: true, message: 'Product list', data: products })
         }
+        const products = await ProductModel.find(filterQuery)
+
+        if (Array.isArray(products) && products.length === 0) {
+            return res.status(404).send({ status: false, message: 'No Product found' })
+        }
+
+        return res.status(200).send({ status: true, message: 'Product list', data: products })
     } catch (error) {
         console.log(error)
         res.status(500).send({ msg: error.message })
