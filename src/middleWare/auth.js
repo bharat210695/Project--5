@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const UserModel = require('../models/userModel')
+const mongoose = require('mongoose')
 
 const isValidObjectId = function(objectId) {
     return mongoose.Types.ObjectId.isValid(objectId)
@@ -8,62 +9,50 @@ const isValidObjectId = function(objectId) {
 
 // check authentication=============================================//
 const authentication = function(req, res, next) {
-
     try {
-        let token = req.headers["x-api-key"]
+        let token = req.header('Authorization')
+        if (!token) {
+            res.status(401).send({ status: false, msg: " token is required" })
+        }
+        let newToken = token.split(' ')[1]
+        let decodedToken = jwt.verify(newToken, "RoomNo-14", { ignoreExpiration: true })
+        if (!decodedToken) {
+            return res.status(401).send({ status: false, msg: "token is invalid" })
+        }
+        let timeToExpire = Math.floor(Date.now() / 1000)
+        if (decodedToken.exp < timeToExpire) {
+            return res.status(401).send({ status: false, msg: "token is expired please login again" })
+        }
 
-        if (!token)
-            return res.status(401).send({ status: false, msg: "Token not present" })
-
-        let decodedToken = jwt.verify(token, "Bharat")
-
-        if (!decodedToken)
-            return res.status(401).send({ status: false, msg: "Token is invalid" })
-
-        // req['authenticateToken'] = token
         next()
-
     } catch (error) {
         console.log(error)
-        res.status(500).send({ status: false, msg: error.message })
+        res.status(500).send({ msg: error })
     }
 }
 
-// check authorization===================================================
-const authorization = function(req, res, next) {
+
+let authorization = async function(req, res, next) {
     try {
-        let token = req.headers["x-api-key"]
-
-        if (!token)
-            return res.status(401).send({ status: false, msg: "Token not present" })
-
-        let decodedToken = jwt.verify(token, "Bharat")
-
-        if (!decodedToken)
-            return res.status(401).send({ status: false, msg: "Token is invalid" })
-
-        let userId = req.query.userId
+        let userId = req.params.userId
 
         if (!isValidObjectId(userId)) {
-            res.status(400).send({ status: false, msg: " userID is not a valid ObjectId" })
+            res.status(400).send({ status: false, msg: " bookId is not a valid ObjectId" })
         }
-
-        if (!userId)
-            return res.status(400).send({ status: false, msg: "Please Send User Id" })
-
-        let userLoggedIn = decodedToken.userId
-
-        if (userId !== userLoggedIn) {
-
-            res.status(403).send({ status: false, msg: "User is not Allowed access the request" })
+        let token = req.header("Authorization").split(' ')[1]
+        let decodedToken = jwt.verify(token, "RoomNo-14")
+        let userDetails = await UserModel.findOne({ _id: userId })
+        if (!userDetails) {
+            return res.status(404).send({ status: false, msg: "id not found" })
+        }
+        if (decodedToken.userId != userDetails._id) {
+            return res.status(403).send({ status: false, msg: "you are not authorized" })
         }
         next()
-
     } catch (error) {
         console.log(error)
-        res.status(500).send({ status: false, msg: error.message })
+        res.status(500).send({ msg: error })
     }
-
 }
 
 

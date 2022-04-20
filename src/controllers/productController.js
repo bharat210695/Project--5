@@ -1,10 +1,8 @@
-const { default: mongoose } = require('mongoose')
+const mongoose = require('mongoose')
 const ProductModel = require('../models/productModel')
 const ObjectId = mongoose.Types.ObjectId
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
 const aws = require('aws-sdk')
-const validator = require('validator')
+
 
 const isValid = function(value) {
     if (typeof value === 'undefined' || value === null) return false
@@ -49,6 +47,7 @@ const createProduct = async function(req, res) {
         let Data = JSON.parse(data)
         let files = req.files
         let { title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments, isDeleted } = Data
+        let availableSizesNewArray = []
 
         if (Object.keys(Data).length == 0) {
             return res.status(400).send({ status: false, message: "request body is empty ,BAD REQUEST" })
@@ -142,7 +141,7 @@ const getProduct = async function(req, res) {
         if (isValid(name)) {
             filterQuery['title'] = {}
             filterQuery['title']['$regex'] = name
-            filterQuery['title']['$options'] = '$i'
+            filterQuery['title']['$options'] = '$in'
         }
         if (isValid(priceGreaterThan)) {
 
